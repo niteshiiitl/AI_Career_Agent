@@ -1,0 +1,4 @@
+# Development and evaluation dependencies — NOT needed for the deployed server
+-r requirements.txt
+ragas>=0.1.9
+datasets>=2.19.0
