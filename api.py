@@ -4,7 +4,7 @@ import os
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 
 load_dotenv()
 
@@ -12,7 +12,7 @@ import asyncio
 from pydantic import BaseModel, Field
 
 from core.agent import run_agent
-from core.retrieval import chroma_client, ingest_jobs
+from core.retrieval import chroma_client, ingest_jobs, VECTOR_STORE_PATH
 from core.schemas import JobMatchResponse, ResumeUpload
 from core.scraper import scrape_and_ingest
 
@@ -103,3 +103,64 @@ async def scrape_and_index_jobs(request: ScrapeRequest):
     except Exception as exc:
         logger.error("Error in /scrape-jobs: %s", exc)
         raise HTTPException(status_code=500, detail=f"Scraper error: {str(exc)}")
+
+
+@app.post("/upload-resume", response_model=JobMatchResponse)
+async def upload_resume(file: UploadFile = File(...)):
+    """Accept a PDF, DOCX, or TXT resume file and return job matches."""
+    filename = file.filename or ""
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in (".pdf", ".docx", ".txt"):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type '{ext}'. Allowed: .pdf, .docx, .txt",
+        )
+    content = await file.read()
+    if ext == ".pdf":
+        try:
+            from pypdf import PdfReader
+            import io
+            reader = PdfReader(io.BytesIO(content))
+            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=f"PDF parse error: {exc}")
+    elif ext == ".docx":
+        try:
+            from docx import Document
+            import io
+            doc = Document(io.BytesIO(content))
+            text = "\n".join(p.text for p in doc.paragraphs)
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=f"DOCX parse error: {exc}")
+    else:
+        text = content.decode("utf-8", errors="replace")
+    if len(text.strip()) < 50:
+        raise HTTPException(
+            status_code=422,
+            detail="Extracted text is too short (< 50 characters). Please upload a valid resume.",
+        )
+    logger.info("Received /upload-resume request. Extracted %d chars.", len(text))
+    try:
+        matches = run_agent(text)
+        return JobMatchResponse(matches=matches, total_found=len(matches))
+    except Exception as exc:
+        logger.error("Error in /upload-resume: %s", exc)
+        raise HTTPException(status_code=500, detail=f"Agent error: {str(exc)}")
+
+
+@app.get("/vector-db/status")
+async def vector_db_status():
+    """Return live stats about the ChromaDB collection."""
+    try:
+        collection = chroma_client.get_or_create_collection("jobs")
+        total = collection.count()
+        return {
+            "collection": "jobs",
+            "total_documents": total,
+            "embedding_model": "all-MiniLM-L6-v2",
+            "vector_store_path": VECTOR_STORE_PATH,
+            "status": "ready",
+        }
+    except Exception as exc:
+        logger.error("Error in /vector-db/status: %s", exc)
+        raise HTTPException(status_code=500, detail=f"ChromaDB error: {str(exc)}")
