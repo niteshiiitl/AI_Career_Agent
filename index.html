@@ -21,7 +21,7 @@
       --success:     #22c55e;
       --warning:     #eab308;
       --danger:      #ef4444;
-      --orange:      #f97316;
+      --orange:      #fb923c;
       --radius:      12px;
       --transition:  0.2s ease;
     }
@@ -42,55 +42,41 @@
     a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
     a:hover { color: #60a5fa; }
 
-    /* ── Card ───────────────────────────────────────────────────────────── */
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-    }
-
     /* ── Header ─────────────────────────────────────────────────────────── */
     header {
       text-align: center;
-      padding: 48px 24px 32px;
+      padding: 48px 24px 28px;
     }
 
     .logo {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      font-size: 1.75rem;
+      font-size: 1.9rem;
       font-weight: 700;
       margin-bottom: 10px;
     }
 
-    .logo-emoji { font-size: 2rem; }
-
+    .logo-emoji { font-size: 2.1rem; }
     .logo-career { color: #fff; }
-
-    .logo-rag {
-      color: var(--accent);
-      font-weight: 700;
-    }
+    .logo-rag { color: var(--accent); font-weight: 700; }
 
     .header-subtitle {
       color: var(--text-muted);
       font-size: 1rem;
       font-weight: 400;
       max-width: 500px;
-      margin: 0 auto 24px;
+      margin: 0 auto 20px;
     }
 
-    /* Animated gradient line */
+    /* Animated gradient underline beneath logo */
     .gradient-line {
       height: 3px;
       border-radius: 9999px;
       background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6, #3b82f6);
       background-size: 200% 100%;
       animation: gradientShift 3s linear infinite;
-      max-width: 600px;
+      max-width: 520px;
       margin: 0 auto;
     }
 
@@ -99,16 +85,60 @@
       100% { background-position: 200% 50%; }
     }
 
+    /* ── System Status Bar ──────────────────────────────────────────────── */
+    #statusBar {
+      width: 100%;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 9999px;
+      padding: 7px 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .status-pill.error {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* Skeleton loading pulse for status pills */
+    .status-pill.skeleton {
+      border-color: var(--border);
+      animation: skeletonPulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes skeletonPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
     /* ── Main Grid ──────────────────────────────────────────────────────── */
     main {
       flex: 1;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
       padding: 32px 24px;
       display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 24px;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
       align-items: start;
     }
 
@@ -120,111 +150,303 @@
     }
 
     /* ── Left Column ────────────────────────────────────────────────────── */
-    .left-col { display: flex; flex-direction: column; gap: 16px; }
+    .left-col { display: flex; flex-direction: column; gap: 18px; }
 
-    /* Resume card */
-    .card-label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
+    /* ── Tab Switcher ───────────────────────────────────────────────────── */
+    .tab-switcher {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
     }
 
-    textarea#resume-input {
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition);
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text-dim);
+    }
+
+    /* ── Tab Content Panels ─────────────────────────────────────────────── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Resume Card (Tabs wrapper) ─────────────────────────────────────── */
+    .resume-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    /* ── Textarea ───────────────────────────────────────────────────────── */
+    textarea#resumeTextarea {
       width: 100%;
-      min-height: 300px;
+      min-height: 280px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text);
       font-family: 'Inter', sans-serif;
-      font-size: 0.875rem;
-      line-height: 1.6;
+      font-size: 0.85rem;
+      line-height: 1.65;
       padding: 14px;
       resize: vertical;
       transition: border-color var(--transition), box-shadow var(--transition);
       outline: none;
+      margin-top: 14px;
     }
 
-    textarea#resume-input:focus {
+    textarea#resumeTextarea:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
-    #char-count {
+    #charCount {
       display: block;
       font-size: 0.75rem;
       color: var(--text-muted);
-      margin-top: 6px;
+      margin-top: 7px;
       text-align: right;
       transition: color var(--transition);
     }
 
-    #inline-error {
-      display: none;
-      color: var(--danger);
-      font-size: 0.8rem;
-      margin-top: 6px;
-    }
+    #charCount.red { color: var(--danger); }
+    #charCount.green { color: var(--success); }
 
-    /* ── Scrape panel ───────────────────────────────────────────────────── */
-    .scrape-toggle-btn {
-      width: 100%;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text-dim);
-      font-family: 'Inter', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 500;
-      padding: 14px 18px;
-      cursor: pointer;
+    /* ── Upload Zone ────────────────────────────────────────────────────── */
+    #uploadZone {
+      min-height: 180px;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      transition: background var(--transition), border-color var(--transition), color var(--transition);
+      justify-content: center;
+      gap: 10px;
+      padding: 32px 20px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color var(--transition), background var(--transition);
+      margin-top: 14px;
     }
 
-    .scrape-toggle-btn:hover {
-      background: var(--surface);
+    #uploadZone:hover, #uploadZone.drag-over {
       border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .upload-icon { font-size: 2.5rem; line-height: 1; }
+
+    .upload-title {
+      font-size: 0.95rem;
+      font-weight: 600;
       color: var(--text);
     }
 
-    .chevron { transition: transform var(--transition); font-style: normal; }
-    .chevron.open { transform: rotate(180deg); }
-
-    .scrape-panel {
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-      padding-top: 4px;
+    .upload-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
-    .scrape-panel.visible { display: flex; }
+    .btn-browse {
+      background: transparent;
+      border: 1px solid var(--accent);
+      border-radius: 7px;
+      color: var(--accent);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 18px;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      margin-top: 4px;
+    }
 
-    .scrape-card {
+    .btn-browse:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* File info row */
+    #fileInfo {
+      display: none;
+      margin-top: 12px;
+      background: rgba(59, 130, 246, 0.07);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #fileInfo.visible { display: flex; }
+
+    .file-icon { font-size: 1.3rem; }
+
+    .file-details { flex: 1; min-width: 0; }
+
+    .file-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-size { font-size: 0.75rem; color: var(--text-muted); }
+
+    .btn-clear-file {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color var(--transition), background var(--transition);
+      flex-shrink: 0;
+    }
+
+    .btn-clear-file:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+    /* ── How It Works Pipeline ──────────────────────────────────────────── */
+    .how-it-works {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 0 0 var(--radius) var(--radius);
+      border-radius: var(--radius);
       padding: 20px;
-      border-top: none;
+    }
+
+    .how-it-works h3 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .pipeline {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .pipeline-step {
+      flex: 1;
+      min-width: 90px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pipeline-icon { font-size: 1.5rem; line-height: 1; }
+
+    .pipeline-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .pipeline-desc {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .pipeline-arrow {
+      flex-shrink: 0;
+      font-size: 1rem;
+      color: var(--border);
+      padding: 0 4px;
+      align-self: center;
+      margin-top: -8px;
+    }
+
+    @media (max-width: 600px) {
+      .pipeline {
+        flex-direction: column;
+        align-items: center;
+      }
+      .pipeline-arrow {
+        transform: rotate(90deg);
+        margin: 2px 0;
+      }
+      .pipeline-step { min-width: 180px; width: 100%; }
+    }
+
+    /* ── Scrape Panel (collapsible <details>) ───────────────────────────── */
+    details.scrape-details {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    details.scrape-details summary {
+      padding: 14px 18px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    details.scrape-details summary:hover {
+      background: rgba(59, 130, 246, 0.05);
+      color: var(--text);
+    }
+
+    details.scrape-details summary::-webkit-details-marker { display: none; }
+
+    .scrape-body {
+      padding: 0 18px 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
     }
 
     .form-group { display: flex; flex-direction: column; gap: 4px; }
 
     .form-label {
-      font-size: 0.75rem;
-      font-weight: 500;
+      font-size: 0.72rem;
+      font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
 
     .form-input, .form-select {
@@ -247,7 +469,7 @@
     .form-select option { background: var(--surface); }
 
     .btn-scrape {
-      background: var(--surface);
+      background: transparent;
       border: 1px solid var(--accent);
       border-radius: 8px;
       color: var(--accent);
@@ -257,14 +479,15 @@
       padding: 10px 16px;
       cursor: pointer;
       transition: background var(--transition), color var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
     }
 
-    .btn-scrape:hover {
-      background: var(--accent);
-      color: #fff;
-    }
+    .btn-scrape:hover { background: var(--accent); color: #fff; }
+    .btn-scrape:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    #scrape-status {
+    #scrapeStatus {
       font-size: 0.8rem;
       color: var(--text-dim);
       min-height: 20px;
@@ -273,8 +496,8 @@
       gap: 6px;
     }
 
-    /* ── Match Button ───────────────────────────────────────────────────── */
-    #match-btn {
+    /* ── Find Matches Button ────────────────────────────────────────────── */
+    #matchBtn {
       width: 100%;
       background: linear-gradient(135deg, #3b82f6, #6366f1);
       border: none;
@@ -283,7 +506,7 @@
       font-family: 'Inter', sans-serif;
       font-size: 1rem;
       font-weight: 600;
-      padding: 16px;
+      padding: 14px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -292,19 +515,19 @@
       transition: filter var(--transition), transform var(--transition), opacity var(--transition);
     }
 
-    #match-btn:hover:not(:disabled) {
+    #matchBtn:hover:not(:disabled) {
       filter: brightness(1.12);
       transform: translateY(-1px);
     }
 
-    #match-btn:disabled {
+    #matchBtn:disabled {
       opacity: 0.7;
       cursor: not-allowed;
       transform: none;
     }
 
-    /* ── Stats bar ──────────────────────────────────────────────────────── */
-    #stats-bar {
+    /* ── Stats Container ────────────────────────────────────────────────── */
+    #statsContainer {
       display: none;
       gap: 10px;
       flex-wrap: wrap;
@@ -327,44 +550,51 @@
     }
 
     /* ── Right Column ───────────────────────────────────────────────────── */
-    .right-col { display: flex; flex-direction: column; gap: 16px; }
+    .right-col { display: flex; flex-direction: column; gap: 18px; }
 
-    /* Empty state */
-    #empty-state {
+    /* ── Empty State ────────────────────────────────────────────────────── */
+    #emptyState {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 80px 24px;
+      padding: 72px 24px;
       text-align: center;
-      animation: pulse 2s ease-in-out infinite;
+      animation: emptyPulse 2.5s ease-in-out infinite;
     }
 
-    @keyframes pulse {
+    @keyframes emptyPulse {
       0%, 100% { opacity: 1; }
       50%       { opacity: 0.6; }
     }
 
-    #empty-state svg {
-      margin-bottom: 20px;
-      opacity: 0.5;
-    }
+    #emptyState svg { margin-bottom: 20px; }
 
-    #empty-state p {
-      color: var(--text-muted);
+    #emptyState .empty-title {
+      color: var(--text-dim);
       font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 6px;
     }
 
-    /* Results */
-    #results-list { display: flex; flex-direction: column; gap: 16px; }
+    #emptyState .empty-sub {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
 
-    /* Match card */
+    /* ── Results Container ──────────────────────────────────────────────── */
+    #resultsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── Match Card ─────────────────────────────────────────────────────── */
     .match-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px 24px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+      padding: 20px;
       opacity: 0;
       transform: translateX(40px);
       transition: opacity 0.4s ease, transform 0.4s ease, border-color var(--transition);
@@ -377,19 +607,19 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .match-job-title {
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 1.05rem;
+      font-weight: 700;
       color: var(--text);
       flex: 1;
     }
 
     .match-job-company {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      font-size: 0.82rem;
+      color: var(--text-dim);
       margin-top: 2px;
     }
 
@@ -397,19 +627,39 @@
       display: inline-block;
       padding: 4px 12px;
       border-radius: 9999px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.875rem;
       white-space: nowrap;
       flex-shrink: 0;
     }
 
-    .score-green  { background: rgba(34, 197, 94, 0.15);  color: var(--success);  border: 1px solid rgba(34, 197, 94, 0.3); }
-    .score-yellow { background: rgba(234, 179, 8, 0.15);  color: var(--warning);  border: 1px solid rgba(234, 179, 8, 0.3); }
-    .score-red    { background: rgba(239, 68, 68, 0.15);  color: var(--danger);   border: 1px solid rgba(239, 68, 68, 0.3); }
+    .score-green  { background: rgba(34, 197, 94, 0.15);  color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .score-yellow { background: rgba(234, 179, 8, 0.15);  color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); }
+    .score-red    { background: rgba(239, 68, 68, 0.15);  color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Progress bar */
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 9999px;
+      margin: 10px 0 14px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.6s ease;
+    }
+
+    .progress-green  { background: #22c55e; }
+    .progress-yellow { background: #eab308; }
+    .progress-red    { background: #ef4444; }
 
     .skills-section { margin-bottom: 12px; }
 
-    .skills-section-label {
+    .skills-label {
       font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -422,15 +672,15 @@
       display: inline-block;
       padding: 2px 10px;
       border-radius: 9999px;
-      font-size: 0.75rem;
-      margin: 2px;
+      font-size: 0.72rem;
       font-weight: 500;
+      margin: 2px 2px 2px 0;
     }
 
-    .pill-green  { background: rgba(34, 197, 94, 0.12);  color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
-    .pill-orange { background: rgba(249, 115, 22, 0.12); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.25); }
+    .pill-green  { background: #166534; color: #22c55e; }
+    .pill-orange { background: #92400e; color: #fb923c; }
 
-    .reasoning-section { margin-top: 12px; }
+    .reasoning-section { margin-top: 10px; }
 
     .reasoning-text {
       font-size: 0.85rem;
@@ -440,7 +690,6 @@
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      transition: all var(--transition);
     }
 
     .reasoning-text.expanded {
@@ -462,6 +711,89 @@
 
     .show-more-btn:hover { color: #60a5fa; }
 
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px 0;
+    }
+
+    /* ── Vector DB Panel ────────────────────────────────────────────────── */
+    #vectorDbPanel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .vdb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .vdb-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-refresh {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition), transform 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-refresh:hover { color: var(--text); border-color: var(--accent); }
+    .btn-refresh.spinning { animation: spin 0.6s linear infinite; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .vdb-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 14px;
+    }
+
+    .vdb-table { width: 100%; border-collapse: collapse; }
+
+    .vdb-table tr td {
+      padding: 6px 0;
+      font-size: 0.83rem;
+      vertical-align: middle;
+    }
+
+    .vdb-table tr td:first-child {
+      color: var(--text-muted);
+      width: 50%;
+      font-weight: 500;
+    }
+
+    .vdb-table tr td:last-child {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .vdb-status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      background: var(--success);
+    }
+
+    .vdb-status-dot.offline { background: var(--danger); }
+
     /* ── Spinner ────────────────────────────────────────────────────────── */
     .spinner {
       display: inline-block;
@@ -470,31 +802,27 @@
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-top-color: #fff;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle;
+      animation: spinKf 0.8s linear infinite;
       flex-shrink: 0;
     }
 
     .spinner-sm {
       display: inline-block;
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-top-color: #fff;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle;
+      animation: spinKf 0.8s linear infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spinKf { to { transform: rotate(360deg); } }
 
     /* ── Toast ──────────────────────────────────────────────────────────── */
-    #toast-container {
+    #toastContainer {
       position: fixed;
-      top: 24px;
-      right: 24px;
+      top: 20px;
+      right: 20px;
       z-index: 9999;
       display: flex;
       flex-direction: column;
@@ -506,25 +834,29 @@
       pointer-events: auto;
       min-width: 260px;
       max-width: 360px;
+      background: var(--surface);
       border-radius: 8px;
-      padding: 14px 18px;
+      padding: 13px 18px;
       font-size: 0.875rem;
       font-weight: 500;
-      color: #fff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      color: var(--text);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      border-left: 4px solid var(--success);
       transform: translateX(120%);
-      animation: slideIn 0.3s ease forwards;
+      animation: toastIn 0.3s ease forwards;
     }
 
-    .toast-success { background: var(--success); }
-    .toast-error   { background: var(--danger); }
+    .toast.error { border-left-color: var(--danger); }
 
-    @keyframes slideIn {
-      to { transform: translateX(0); }
-    }
+    @keyframes toastIn  { to { transform: translateX(0); } }
+    @keyframes toastOut { to { transform: translateX(120%); opacity: 0; } }
 
-    @keyframes slideOut {
-      to { transform: translateX(120%); opacity: 0; }
+    /* ── Card helper ─────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
     }
 
     /* ── Footer ─────────────────────────────────────────────────────────── */
@@ -538,26 +870,21 @@
 
     footer a { margin-left: 12px; }
 
-    /* ── Scrape panel wrapper (keeps toggle + card flush) ───────────────── */
-    .scrape-wrapper { display: flex; flex-direction: column; }
-
-    .scrape-toggle-btn.open {
-      border-radius: var(--radius) var(--radius) 0 0;
-      border-color: var(--border);
+    /* ── Slide-in animation for match cards ─────────────────────────────── */
+    @keyframes slideInCard {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
 
-    /* ── Section divider in match card ─────────────────────────────────── */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 14px 0;
+    .card-animated {
+      animation: slideInCard 0.4s ease forwards;
     }
   </style>
 </head>
 <body>
 
-  <!-- ── Toast container ──────────────────────────────────────────────── -->
-  <div id="toast-container"></div>
+  <!-- ── Toast Container ──────────────────────────────────────────────── -->
+  <div id="toastContainer"></div>
 
   <!-- ── Header ───────────────────────────────────────────────────────── -->
   <header>
@@ -566,115 +893,211 @@
       <span class="logo-career">CareerAgent</span>
       <span class="logo-rag">RAG</span>
     </div>
-    <p class="header-subtitle">AI-powered job matching — paste your resume, find your best opportunities</p>
     <div class="gradient-line"></div>
+    <p class="header-subtitle" style="margin-top:14px;">AI-Powered Job Matching with Semantic Search</p>
   </header>
 
-  <!-- ── Main content ──────────────────────────────────────────────────── -->
+  <!-- ── System Status Bar ────────────────────────────────────────────── -->
+  <div id="statusBar">
+    <span class="status-pill skeleton" id="statusPill1">🗄️ &nbsp; Loading...</span>
+    <span class="status-pill skeleton" id="statusPill2">🧠 &nbsp; Loading...</span>
+    <span class="status-pill skeleton" id="statusPill3">⚡ &nbsp; Loading...</span>
+  </div>
+
+  <!-- ── Main Content ──────────────────────────────────────────────────── -->
   <main>
 
-    <!-- LEFT column -->
+    <!-- LEFT COLUMN -->
     <div class="left-col">
 
-      <!-- Resume input card -->
-      <div class="card">
-        <label class="card-label" for="resume-input">Your Resume</label>
-        <textarea
-          id="resume-input"
-          placeholder="Jane Smith
-jane@email.com · linkedin.com/in/janesmith · github.com/janesmith
+      <!-- Resume card with tab switcher -->
+      <div class="resume-card">
+        <!-- Tab switcher -->
+        <div class="tab-switcher">
+          <button class="tab-btn active" id="tabPaste" onclick="switchTab('paste')">📄 Paste Resume</button>
+          <button class="tab-btn" id="tabUpload" onclick="switchTab('upload')">📁 Upload File</button>
+        </div>
 
-SUMMARY
-Backend engineer with 4+ years building scalable APIs and ML pipelines in Python.
-Proficient in FastAPI, AWS Lambda, and deploying models to production via Docker.
+        <!-- Tab 1: Paste Resume -->
+        <div class="tab-panel active" id="panelPaste">
+          <textarea
+            id="resumeTextarea"
+            placeholder="Jane Doe | jane@example.com | github.com/janedoe
 
-SKILLS
-Languages: Python, SQL, Bash
-Frameworks: FastAPI, LangChain, scikit-learn, TensorFlow
-Cloud: AWS (EC2, S3, Lambda, SageMaker), Docker, Kubernetes
-Data: PostgreSQL, Redis, ChromaDB, Pandas, NumPy
+Summary: Full-stack engineer with 5 years building scalable APIs and ML pipelines.
 
-EXPERIENCE
-Senior Backend Engineer — Acme AI, 2021–Present
-  • Built a real-time recommendation engine using Machine Learning and embedding search
-  • Reduced API latency 40% by optimizing FastAPI async endpoints on AWS"
-        ></textarea>
-        <span id="char-count">0 characters</span>
-        <div id="inline-error"></div>
-      </div>
+Skills: Python, FastAPI, LangChain, AWS, Docker, PostgreSQL, Redis, TensorFlow
 
-      <!-- Scrape fresh jobs (collapsible) -->
-      <div class="scrape-wrapper">
-        <button class="scrape-toggle-btn" id="scrape-toggle" onclick="toggleScrapePanel()">
-          <span>🔍 Scrape Live Job Listings</span>
-          <em class="chevron" id="scrape-chevron">▼</em>
-        </button>
-        <div id="scrape-panel" class="scrape-panel">
-          <div class="scrape-card">
-            <div class="form-group">
-              <label class="form-label" for="scrape-query">Job Search Query</label>
-              <input class="form-input" id="scrape-query" type="text" placeholder="Machine Learning Engineer" />
+Experience:
+  Software Engineer @ TechCorp (2021-2024)
+  - Built REST APIs serving 1M+ requests/day using FastAPI
+  - Deployed ML models to AWS SageMaker
+
+Education: B.Sc. Computer Science, 2019"
+          ></textarea>
+          <span id="charCount" class="red">0 characters</span>
+        </div>
+
+        <!-- Tab 2: Upload File -->
+        <div class="tab-panel" id="panelUpload">
+          <div id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📄</div>
+            <div class="upload-title">Drag &amp; drop your resume here</div>
+            <div class="upload-sub">Supports PDF, DOCX, TXT</div>
+            <button class="btn-browse" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Browse Files</button>
+          </div>
+          <!-- Hidden file input -->
+          <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display:none" />
+          <!-- File info row (shown after selection) -->
+          <div id="fileInfo">
+            <span class="file-icon">✅</span>
+            <div class="file-details">
+              <div class="file-name" id="fileName">—</div>
+              <div class="file-size" id="fileSize">—</div>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="scrape-location">Location</label>
-              <input class="form-input" id="scrape-location" type="text" placeholder="United States" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="scrape-num">Number of Results</label>
-              <input class="form-input" id="scrape-num" type="number" min="1" max="50" value="10" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="scrape-backend">Backend</label>
-              <select class="form-select" id="scrape-backend">
-                <option value="auto">auto</option>
-                <option value="jsearch">jsearch</option>
-                <option value="indeed">indeed</option>
-              </select>
-            </div>
-            <button class="btn-scrape" onclick="scrapeJobs()">Scrape &amp; Index Jobs</button>
-            <div id="scrape-status"></div>
+            <button class="btn-clear-file" onclick="clearFile()" title="Remove file">✕</button>
           </div>
         </div>
-      </div>
+      </div><!-- /resume-card -->
 
-      <!-- Action button -->
-      <button id="match-btn" onclick="matchJobs()">Find My Job Matches →</button>
+      <!-- How It Works Pipeline -->
+      <section class="how-it-works">
+        <h3>How It Works</h3>
+        <div class="pipeline">
+          <div class="pipeline-step">
+            <span class="pipeline-icon">📄</span>
+            <span class="pipeline-label">Resume</span>
+            <span class="pipeline-desc">Your text is parsed and cleaned</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-step">
+            <span class="pipeline-icon">🧠</span>
+            <span class="pipeline-label">Embeddings</span>
+            <span class="pipeline-desc">all-MiniLM-L6-v2 encodes your skills</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-step">
+            <span class="pipeline-icon">🗄️</span>
+            <span class="pipeline-label">Vector Search</span>
+            <span class="pipeline-desc">ChromaDB finds top-5 similar jobs</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-step">
+            <span class="pipeline-icon">🤖</span>
+            <span class="pipeline-label">LLM Reasoning</span>
+            <span class="pipeline-desc">Groq llama3 scores and explains matches</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-step">
+            <span class="pipeline-icon">✅</span>
+            <span class="pipeline-label">Matches</span>
+            <span class="pipeline-desc">Ranked results with skill gap analysis</span>
+          </div>
+        </div>
+      </section>
 
-      <!-- Stats bar -->
-      <div id="stats-bar">
-        <span class="stats-pill" id="stats-count">0 jobs matched</span>
-        <span class="stats-pill" id="stats-top">Top score: —</span>
+      <!-- Scrape Live Jobs (collapsible <details>) -->
+      <details class="scrape-details">
+        <summary>🔍 Scrape Live Jobs <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);">▸</span></summary>
+        <div class="scrape-body">
+          <div class="form-group">
+            <label class="form-label" for="scrapeQuery">Search Query</label>
+            <input class="form-input" id="scrapeQuery" type="text" placeholder="e.g. Python Backend Engineer" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="scrapeLocation">Location</label>
+            <input class="form-input" id="scrapeLocation" type="text" placeholder="e.g. United States" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="scrapeNum">Number of Results (1–50)</label>
+            <input class="form-input" id="scrapeNum" type="number" min="1" max="50" value="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="scrapeBackend">Backend</label>
+            <select class="form-select" id="scrapeBackend">
+              <option value="auto">auto</option>
+              <option value="jsearch">jsearch</option>
+              <option value="indeed">indeed</option>
+            </select>
+          </div>
+          <button class="btn-scrape" id="scrapeBtn" onclick="scrapeJobs()">🔍 Scrape &amp; Index</button>
+          <div id="scrapeStatus"></div>
+        </div>
+      </details>
+
+      <!-- Find Matches Button -->
+      <button id="matchBtn" onclick="matchJobs()">Find My Job Matches →</button>
+
+      <!-- Stats pills (hidden until results arrive) -->
+      <div id="statsContainer" style="display:none; gap:10px; flex-wrap:wrap;">
+        <span class="stats-pill" id="statCount">0 matches found</span>
+        <span class="stats-pill" id="statTop">Top score: —</span>
       </div>
 
     </div><!-- /left-col -->
 
-    <!-- RIGHT column -->
+    <!-- RIGHT COLUMN -->
     <div class="right-col">
 
       <!-- Empty state -->
-      <div id="empty-state">
-        <svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div id="emptyState">
+        <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
           <!-- Document body -->
-          <rect x="12" y="8" width="48" height="62" rx="6" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="10" y="8" width="52" height="68" rx="7" fill="#1e293b" stroke="#334155" stroke-width="2.5"/>
           <!-- Document lines -->
-          <rect x="22" y="22" width="28" height="3" rx="1.5" fill="#334155"/>
-          <rect x="22" y="31" width="28" height="3" rx="1.5" fill="#334155"/>
-          <rect x="22" y="40" width="20" height="3" rx="1.5" fill="#334155"/>
-          <!-- Magnifying glass circle -->
-          <circle cx="62" cy="62" r="16" fill="#0f172a" stroke="#3b82f6" stroke-width="2.5"/>
-          <!-- Magnifying glass lens inner -->
-          <circle cx="62" cy="62" r="10" fill="none" stroke="#6366f1" stroke-width="2"/>
+          <rect x="20" y="24" width="32" height="4" rx="2" fill="#334155"/>
+          <rect x="20" y="34" width="32" height="4" rx="2" fill="#334155"/>
+          <rect x="20" y="44" width="22" height="4" rx="2" fill="#334155"/>
+          <rect x="20" y="54" width="28" height="4" rx="2" fill="#2d3f55"/>
+          <!-- Magnifying glass ring -->
+          <circle cx="68" cy="68" r="18" fill="#0f172a" stroke="#3b82f6" stroke-width="3"/>
+          <circle cx="68" cy="68" r="11" fill="none" stroke="#6366f1" stroke-width="2"/>
           <!-- Handle -->
-          <line x1="73" y1="73" x2="82" y2="82" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
-          <!-- Inner search cross-hair -->
-          <line x1="62" y1="56" x2="62" y2="68" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-          <line x1="56" y1="62" x2="68" y2="62" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <line x1="80" y1="80" x2="90" y2="90" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
+          <!-- Cross-hairs -->
+          <line x1="68" y1="61" x2="68" y2="75" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+          <line x1="61" y1="68" x2="75" y2="68" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
         </svg>
-        <p>Your matched jobs will appear here</p>
+        <p class="empty-title">Your matched jobs will appear here</p>
+        <p class="empty-sub">Paste or upload your resume and click Find My Job Matches</p>
       </div>
 
-      <!-- Results list (cards injected by JS) -->
-      <div id="results-list"></div>
+      <!-- Results container (cards injected here) -->
+      <div id="resultsContainer"></div>
+
+      <!-- Vector DB Panel -->
+      <div id="vectorDbPanel">
+        <div class="vdb-header">
+          <span class="vdb-title">🗄️ &nbsp; Vector Database</span>
+          <button class="btn-refresh" id="refreshBtn" onclick="loadVectorDBStatus()" title="Refresh status">↻</button>
+        </div>
+        <hr class="vdb-divider" />
+        <table class="vdb-table">
+          <tr>
+            <td>Collection</td>
+            <td id="vdbCollection">—</td>
+          </tr>
+          <tr>
+            <td>Documents</td>
+            <td id="vdbDocuments">—</td>
+          </tr>
+          <tr>
+            <td>Embeddings</td>
+            <td id="vdbEmbeddings">—</td>
+          </tr>
+          <tr>
+            <td>Store path</td>
+            <td id="vdbPath" style="font-size:0.75rem; word-break:break-all;">—</td>
+          </tr>
+          <tr>
+            <td>Status</td>
+            <td id="vdbStatus">
+              <span class="vdb-status-dot offline" id="vdbDot"></span>
+              <span id="vdbStatusText">Connecting...</span>
+            </td>
+          </tr>
+        </table>
+      </div><!-- /vectorDbPanel -->
 
     </div><!-- /right-col -->
 
@@ -682,83 +1105,285 @@ Senior Backend Engineer — Acme AI, 2021–Present
 
   <!-- ── Footer ───────────────────────────────────────────────────────── -->
   <footer>
-    <span>Powered by LangChain · Groq · ChromaDB · FastAPI</span>
-    <a href="https://careeragent-rag.onrender.com/docs" target="_blank" rel="noopener">API Docs →</a>
+    <span>Powered by LangChain · Groq LLM · ChromaDB · HuggingFace Embeddings · FastAPI</span>
+    <a href="https://careeragent-rag.onrender.com/docs" target="_blank" rel="noopener noreferrer">API Docs →</a>
   </footer>
 
   <!-- ── JavaScript ───────────────────────────────────────────────────── -->
   <script>
+    'use strict';
+
     const API_BASE = "https://careeragent-rag.onrender.com";
 
-    /* ── Character counter ─────────────────────────────────────────────── */
-    document.getElementById('resume-input').addEventListener('input', function () {
-      const len = this.value.length;
-      const counter = document.getElementById('char-count');
-      counter.textContent = len + ' characters';
-      counter.style.color = len < 50 ? '#ef4444' : '#64748b';
+    /* ════════════════════════════════════════════════════════════════════
+       STATE
+    ════════════════════════════════════════════════════════════════════ */
+    var selectedFile = null;
+    var activeTab = 'paste';
+
+    /* ════════════════════════════════════════════════════════════════════
+       DOM READY
+    ════════════════════════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function () {
+      loadVectorDBStatus();
+      wireCharCounter();
+      wireDragDrop();
+      document.getElementById('fileInput').addEventListener('change', function (e) {
+        var f = e.target.files[0];
+        if (f) setSelectedFile(f);
+        e.target.value = '';
+      });
     });
 
-    /* ── Scrape panel toggle ───────────────────────────────────────────── */
-    function toggleScrapePanel() {
-      const panel   = document.getElementById('scrape-panel');
-      const chevron = document.getElementById('scrape-chevron');
-      const btn     = document.getElementById('scrape-toggle');
-      const isOpen  = panel.classList.contains('visible');
-      if (isOpen) {
-        panel.classList.remove('visible');
-        chevron.classList.remove('open');
-        btn.classList.remove('open');
-        chevron.textContent = '▼';
-      } else {
-        panel.classList.add('visible');
-        chevron.classList.add('open');
-        btn.classList.add('open');
-        chevron.textContent = '▲';
+    /* ════════════════════════════════════════════════════════════════════
+       TAB SWITCHER
+    ════════════════════════════════════════════════════════════════════ */
+    function switchTab(name) {
+      activeTab = name;
+      document.getElementById('tabPaste').classList.toggle('active', name === 'paste');
+      document.getElementById('tabUpload').classList.toggle('active', name === 'upload');
+      document.getElementById('panelPaste').classList.toggle('active', name === 'paste');
+      document.getElementById('panelUpload').classList.toggle('active', name === 'upload');
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       CHARACTER COUNTER
+    ════════════════════════════════════════════════════════════════════ */
+    function wireCharCounter() {
+      var ta = document.getElementById('resumeTextarea');
+      var cc = document.getElementById('charCount');
+      ta.addEventListener('input', function () {
+        var n = ta.value.length;
+        cc.textContent = n + ' characters';
+        cc.className = n < 50 ? 'red' : 'green';
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       DRAG & DROP
+    ════════════════════════════════════════════════════════════════════ */
+    function wireDragDrop() {
+      var zone = document.getElementById('uploadZone');
+
+      zone.addEventListener('dragenter', function (e) {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+
+      zone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+
+      zone.addEventListener('dragleave', function (e) {
+        // Only remove class if leaving the zone itself, not a child
+        if (!zone.contains(e.relatedTarget)) {
+          zone.classList.remove('drag-over');
+        }
+      });
+
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) setSelectedFile(file);
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       FILE SELECTION
+    ════════════════════════════════════════════════════════════════════ */
+    function setSelectedFile(file) {
+      var ext = (file.name.split('.').pop() || '').toLowerCase();
+      var allowed = ['pdf', 'docx', 'txt'];
+      if (!allowed.includes(ext)) {
+        showToast('Unsupported file type. Please use PDF, DOCX, or TXT.', 'error');
+        return;
+      }
+      selectedFile = file;
+
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileSize').textContent = formatBytes(file.size);
+      document.getElementById('fileInfo').classList.add('visible');
+      showToast('File selected: ' + file.name, 'success');
+    }
+
+    function clearFile() {
+      selectedFile = null;
+      document.getElementById('fileName').textContent = '—';
+      document.getElementById('fileSize').textContent = '—';
+      document.getElementById('fileInfo').classList.remove('visible');
+    }
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       VECTOR DB STATUS
+    ════════════════════════════════════════════════════════════════════ */
+    async function loadVectorDBStatus() {
+      // Skeleton state
+      var p1 = document.getElementById('statusPill1');
+      var p2 = document.getElementById('statusPill2');
+      var p3 = document.getElementById('statusPill3');
+
+      p1.className = 'status-pill skeleton';
+      p2.className = 'status-pill skeleton';
+      p3.className = 'status-pill skeleton';
+      p1.textContent = '🗄️  Loading...';
+      p2.textContent = '🧠  Loading...';
+      p3.textContent = '⚡  Loading...';
+
+      // Animate refresh button
+      var rb = document.getElementById('refreshBtn');
+      if (rb) rb.classList.add('spinning');
+
+      try {
+        var resp = await fetch(API_BASE + '/vector-db/status');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var data = await resp.json();
+
+        // Status bar pills
+        p1.className = 'status-pill';
+        p2.className = 'status-pill';
+        p3.className = 'status-pill';
+        p1.innerHTML = '🗄️ &nbsp;<strong>ChromaDB</strong> &nbsp;•&nbsp; ' + (data.total_documents || 0) + ' documents';
+        p2.innerHTML = '🧠 &nbsp;<strong>' + escHtml(data.embedding_model || 'all-MiniLM-L6-v2') + '</strong> &nbsp;•&nbsp; Embeddings Ready';
+        p3.innerHTML = '⚡ &nbsp;<strong>Groq LLM</strong> &nbsp;•&nbsp; llama3-8b-8192';
+
+        // Vector DB panel
+        document.getElementById('vdbCollection').textContent = data.collection || 'jobs';
+        document.getElementById('vdbDocuments').textContent  = data.total_documents !== undefined ? data.total_documents : '—';
+        document.getElementById('vdbEmbeddings').textContent = data.embedding_model || '—';
+        document.getElementById('vdbPath').textContent       = data.vector_store_path || '—';
+
+        var dot  = document.getElementById('vdbDot');
+        var txt  = document.getElementById('vdbStatusText');
+        var ready = data.status === 'ready';
+        dot.className = 'vdb-status-dot' + (ready ? '' : ' offline');
+        txt.textContent = ready ? 'Ready' : 'Error';
+
+      } catch (err) {
+        p1.className = 'status-pill error'; p1.textContent = '⚠️  API Offline';
+        p2.className = 'status-pill error'; p2.textContent = '⚠️  API Offline';
+        p3.className = 'status-pill error'; p3.textContent = '⚠️  API Offline';
+
+        document.getElementById('vdbDot').className = 'vdb-status-dot offline';
+        document.getElementById('vdbStatusText').textContent = 'Offline';
+      } finally {
+        if (rb) rb.classList.remove('spinning');
       }
     }
 
-    /* ── Toast notifications ───────────────────────────────────────────── */
-    function showToast(message, type) {
-      type = type || 'success';
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'toast toast-' + type;
-      toast.textContent = message;
-      container.appendChild(toast);
-      setTimeout(function () {
-        toast.style.animation = 'slideOut 0.3s ease forwards';
-        setTimeout(function () {
-          if (toast.parentNode) toast.parentNode.removeChild(toast);
-        }, 320);
-      }, 4000);
+    /* ════════════════════════════════════════════════════════════════════
+       MATCH JOBS
+    ════════════════════════════════════════════════════════════════════ */
+    async function matchJobs() {
+      var btn = document.getElementById('matchBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>&nbsp; Analyzing resume...';
+
+      try {
+        var resp;
+
+        if (activeTab === 'paste') {
+          var text = document.getElementById('resumeTextarea').value.trim();
+          if (text.length < 50) {
+            showToast('Resume text must be at least 50 characters.', 'error');
+            return;
+          }
+          resp = await fetch(API_BASE + '/match-jobs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ resume_text: text })
+          });
+
+        } else {
+          if (!selectedFile) {
+            showToast('Please select a file first.', 'error');
+            return;
+          }
+          var formData = new FormData();
+          formData.append('file', selectedFile);
+          resp = await fetch(API_BASE + '/upload-resume', {
+            method: 'POST',
+            body: formData
+          });
+        }
+
+        if (!resp.ok) {
+          var detail = 'Request failed (' + resp.status + ').';
+          try { var j = await resp.json(); detail = j.detail || detail; } catch (_) {}
+          throw new Error(detail);
+        }
+
+        var data = await resp.json();
+        var matches = Array.isArray(data) ? data : (data.matches || [data]);
+        renderMatches(matches);
+        showToast('✓ Found ' + matches.length + ' job match' + (matches.length !== 1 ? 'es' : '') + '!', 'success');
+
+      } catch (err) {
+        showToast('✗ ' + (err.message || 'Could not reach the API.'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Find My Job Matches →';
+      }
     }
 
-    /* ── Build a single match card DOM element ─────────────────────────── */
-    function createMatchCard(match, index) {
-      const card = document.createElement('div');
-      card.className = 'match-card';
+    /* ════════════════════════════════════════════════════════════════════
+       RENDER MATCHES
+    ════════════════════════════════════════════════════════════════════ */
+    function renderMatches(matches) {
+      document.getElementById('emptyState').style.display = 'none';
 
-      /* Score badge colour */
-      const score = match.match_score || 0;
-      let scoreCls = 'score-red';
-      if (score >= 80) scoreCls = 'score-green';
-      else if (score >= 60) scoreCls = 'score-yellow';
+      var container = document.getElementById('resultsContainer');
+      container.innerHTML = '';
 
-      /* Title: prefer match.title, fall back to match.job_id */
-      const title   = match.title   || match.job_id  || 'Job Match';
-      const company = match.company || '';
+      if (!matches || matches.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text-muted);">No matches found. Try expanding your resume or scraping more jobs.</div>';
+        return;
+      }
 
-      /* Build matched skills pills */
-      const matchedSkills = (match.matched_skills || []).map(function (s) {
+      matches.forEach(function (match, i) {
+        var card = buildMatchCard(match, i);
+        container.appendChild(card);
+      });
+
+      var topScore = Math.max.apply(null, matches.map(function (m) { return m.match_score || 0; }));
+      document.getElementById('statCount').textContent = matches.length + ' matches found';
+      document.getElementById('statTop').textContent   = 'Top score: ' + topScore + '/100';
+      var sc = document.getElementById('statsContainer');
+      sc.style.display = 'flex';
+    }
+
+    function buildMatchCard(match, index) {
+      var card = document.createElement('article');
+      card.className = 'match-card card-animated';
+      card.style.animationDelay = (index * 100) + 'ms';
+
+      var score = match.match_score || 0;
+      var scoreCls, progressCls;
+      if (score >= 70) { scoreCls = 'score-green'; progressCls = 'progress-green'; }
+      else if (score >= 40) { scoreCls = 'score-yellow'; progressCls = 'progress-yellow'; }
+      else { scoreCls = 'score-red'; progressCls = 'progress-red'; }
+
+      var title   = match.title   || match.job_id  || 'Job Match';
+      var company = match.company || '';
+
+      var matchedHTML = (match.matched_skills || []).map(function (s) {
         return '<span class="skill-pill pill-green">' + escHtml(s) + '</span>';
       }).join('');
 
-      /* Build missing skills pills */
-      const missingSkills = (match.missing_skills || []).map(function (s) {
+      var missingHTML = (match.missing_skills || []).map(function (s) {
         return '<span class="skill-pill pill-orange">' + escHtml(s) + '</span>';
       }).join('');
 
-      const reasoning = match.reasoning || '';
+      var reasoning = match.reasoning || '';
+      var reasonId  = 'reason-' + index;
+      var showId    = 'show-' + index;
 
       card.innerHTML =
         '<div class="match-card-header">' +
@@ -768,40 +1393,98 @@ Senior Backend Engineer — Acme AI, 2021–Present
           '</div>' +
           '<span class="score-badge ' + scoreCls + '">' + score + '/100</span>' +
         '</div>' +
-        (matchedSkills
-          ? '<div class="skills-section"><div class="skills-section-label">Matched Skills</div>' + matchedSkills + '</div>'
+        '<div class="progress-track"><div class="progress-fill ' + progressCls + '" style="width:' + score + '%"></div></div>' +
+        (matchedHTML
+          ? '<div class="skills-section"><div class="skills-label">Matched Skills</div>' + matchedHTML + '</div>'
           : '') +
-        (missingSkills
-          ? '<div class="skills-section"><div class="skills-section-label">Missing Skills</div>' + missingSkills + '</div>'
+        (missingHTML
+          ? '<div class="skills-section"><div class="skills-label">Missing Skills</div>' + missingHTML + '</div>'
           : '') +
         (reasoning
-          ? '<hr class="divider" />' +
+          ? '<hr class="divider"/>' +
             '<div class="reasoning-section">' +
-              '<div class="skills-section-label">Reasoning</div>' +
-              '<div class="reasoning-text" id="reason-' + index + '">' + escHtml(reasoning) + '</div>' +
-              '<button class="show-more-btn" id="showmore-' + index + '" onclick="toggleReason(' + index + ')">Show more</button>' +
+              '<div class="skills-label">AI Reasoning</div>' +
+              '<div class="reasoning-text" id="' + reasonId + '">' + escHtml(reasoning) + '</div>' +
+              '<button class="show-more-btn" id="' + showId + '" onclick="toggleReason(' + index + ')">Show more</button>' +
             '</div>'
           : '');
-
-      /* Stagger entrance animation */
-      setTimeout(function () {
-        card.style.opacity    = '1';
-        card.style.transform  = 'translateX(0)';
-      }, index * 120);
 
       return card;
     }
 
-    /* ── Toggle reasoning clamp ────────────────────────────────────────── */
     function toggleReason(index) {
-      const el  = document.getElementById('reason-' + index);
-      const btn = document.getElementById('showmore-' + index);
+      var el  = document.getElementById('reason-' + index);
+      var btn = document.getElementById('show-' + index);
       if (!el) return;
-      const expanded = el.classList.toggle('expanded');
+      var expanded = el.classList.toggle('expanded');
       btn.textContent = expanded ? 'Show less' : 'Show more';
     }
 
-    /* ── HTML escape helper ────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════════
+       SCRAPE JOBS
+    ════════════════════════════════════════════════════════════════════ */
+    async function scrapeJobs() {
+      var query = (document.getElementById('scrapeQuery').value || '').trim();
+      if (!query) {
+        showToast('Please enter a search query first.', 'error');
+        return;
+      }
+      var location   = (document.getElementById('scrapeLocation').value || '').trim() || 'United States';
+      var numResults = parseInt(document.getElementById('scrapeNum').value) || 10;
+      var backend    = document.getElementById('scrapeBackend').value;
+      var statusEl   = document.getElementById('scrapeStatus');
+      var btn        = document.getElementById('scrapeBtn');
+
+      btn.disabled = true;
+      statusEl.innerHTML = '<span class="spinner-sm"></span>&nbsp; Scraping...';
+
+      try {
+        var resp = await fetch(API_BASE + '/scrape-jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query, location: location, num_results: numResults, backend: backend })
+        });
+
+        if (!resp.ok) {
+          var j = await resp.json().catch(function () { return {}; });
+          throw new Error(j.detail || 'Scrape failed.');
+        }
+
+        var data  = await resp.json();
+        var count = data.jobs_ingested !== undefined ? data.jobs_ingested : (data.jobs_added || numResults);
+        statusEl.innerHTML = '<span style="color:var(--success)">✓ ' + count + ' new jobs indexed.</span>';
+        showToast('Scraped ' + count + ' new jobs!', 'success');
+        loadVectorDBStatus();
+
+      } catch (err) {
+        statusEl.innerHTML = '<span style="color:var(--danger)">✗ ' + escHtml(err.message) + '</span>';
+        showToast('✗ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       TOAST NOTIFICATIONS
+    ════════════════════════════════════════════════════════════════════ */
+    function showToast(message, type) {
+      type = type || 'success';
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'toast' + (type === 'error' ? ' error' : '');
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(function () {
+        toast.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(function () {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 320);
+      }, 4000);
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       HTML ESCAPE
+    ════════════════════════════════════════════════════════════════════ */
     function escHtml(str) {
       return String(str)
         .replace(/&/g,  '&amp;')
@@ -811,103 +1494,6 @@ Senior Backend Engineer — Acme AI, 2021–Present
         .replace(/'/g,  '&#039;');
     }
 
-    /* ── Render all match cards ────────────────────────────────────────── */
-    function renderMatches(matches) {
-      const list = document.getElementById('results-list');
-      document.getElementById('empty-state').style.display = 'none';
-      list.innerHTML = '';
-      matches.forEach(function (match, i) {
-        const card = createMatchCard(match, i);
-        list.appendChild(card);
-      });
-
-      /* Stats bar */
-      const topScore = Math.max.apply(null, matches.map(function (m) { return m.match_score || 0; }));
-      document.getElementById('stats-count').textContent = matches.length + ' jobs matched';
-      document.getElementById('stats-top').textContent   = 'Top score: ' + topScore + '/100';
-      document.getElementById('stats-bar').style.display = 'flex';
-    }
-
-    /* ── Main: call /match-jobs ────────────────────────────────────────── */
-    async function matchJobs() {
-      const resumeText = document.getElementById('resume-input').value.trim();
-      const inlineErr  = document.getElementById('inline-error');
-
-      if (resumeText.length < 50) {
-        inlineErr.textContent   = 'Please enter at least 50 characters of resume text.';
-        inlineErr.style.display = 'block';
-        return;
-      }
-      inlineErr.style.display = 'none';
-
-      const btn = document.getElementById('match-btn');
-      btn.disabled  = true;
-      btn.innerHTML = '<span class="spinner"></span> Matching...';
-
-      try {
-        const resp = await fetch(API_BASE + '/match-jobs', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ resume_text: resumeText })
-        });
-
-        if (!resp.ok) {
-          let detail = 'Request failed.';
-          try {
-            const j = await resp.json();
-            detail = j.detail || detail;
-          } catch (_) {}
-          if (resp.status === 422) detail = 'Please enter at least 50 characters of resume text.';
-          throw new Error(detail);
-        }
-
-        const data    = await resp.json();
-        const matches = Array.isArray(data) ? data : (data.matches || [data]);
-        renderMatches(matches);
-        showToast('✓ Found ' + matches.length + ' job matches!', 'success');
-
-      } catch (err) {
-        showToast('✗ ' + (err.message || 'Could not reach the API. Is the server running?'), 'error');
-      } finally {
-        btn.disabled  = false;
-        btn.innerHTML = 'Find My Job Matches →';
-      }
-    }
-
-    /* ── Scrape: call /scrape-jobs ─────────────────────────────────────── */
-    async function scrapeJobs() {
-      const query      = document.getElementById('scrape-query').value.trim()    || 'Software Engineer';
-      const location   = document.getElementById('scrape-location').value.trim() || 'United States';
-      const numResults = parseInt(document.getElementById('scrape-num').value)   || 10;
-      const backend    = document.getElementById('scrape-backend').value;
-      const statusEl   = document.getElementById('scrape-status');
-
-      statusEl.innerHTML = '<span class="spinner-sm"></span>&nbsp;Scraping...';
-
-      try {
-        const resp = await fetch(API_BASE + '/scrape-jobs', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ query, location, num_results: numResults, backend })
-        });
-
-        if (!resp.ok) {
-          const j = await resp.json().catch(function () { return {}; });
-          throw new Error(j.detail || 'Scrape failed.');
-        }
-
-        const data  = await resp.json();
-        const count = data.jobs_added || data.count || numResults;
-        statusEl.textContent   = '✓ ' + count + ' jobs indexed.';
-        statusEl.style.color   = '#22c55e';
-        showToast('✓ ' + count + ' jobs added to index', 'success');
-
-      } catch (err) {
-        statusEl.textContent = '✗ ' + err.message;
-        statusEl.style.color = '#ef4444';
-        showToast('✗ ' + err.message, 'error');
-      }
-    }
   </script>
 
 </body>
