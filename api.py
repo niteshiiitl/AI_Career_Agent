@@ -8,9 +8,13 @@ from fastapi import FastAPI, HTTPException
 
 load_dotenv()
 
+import asyncio
+from pydantic import BaseModel, Field
+
 from core.agent import run_agent
 from core.retrieval import chroma_client, ingest_jobs
 from core.schemas import JobMatchResponse, ResumeUpload
+from core.scraper import scrape_and_ingest
 
 logging.basicConfig(
     level=logging.INFO,
@@ -69,3 +73,33 @@ async def match_jobs(request: ResumeUpload):
     except Exception as exc:
         logger.error("Error in /match-jobs: %s", exc)
         raise HTTPException(status_code=500, detail=f"Agent error: {str(exc)}")
+
+
+class ScrapeRequest(BaseModel):
+    """Request body for the /scrape-jobs endpoint."""
+    query: str
+    location: str = "United States"
+    num_results: int = Field(default=10, ge=1, le=50)
+    backend: str = "auto"
+
+
+@app.post("/scrape-jobs")
+async def scrape_and_index_jobs(request: ScrapeRequest):
+    """Scrape real job postings and add them to the vector index.
+
+    Uses the scraper module to fetch live job listings from JSearch or
+    Indeed, deduplicates them against the existing ChromaDB collection,
+    and ingests any new entries.
+    """
+    try:
+        count = await asyncio.to_thread(
+            scrape_and_ingest,
+            request.query,
+            request.location,
+            request.num_results,
+            request.backend,
+        )
+        return {"message": f"Scraping complete.", "jobs_ingested": count}
+    except Exception as exc:
+        logger.error("Error in /scrape-jobs: %s", exc)
+        raise HTTPException(status_code=500, detail=f"Scraper error: {str(exc)}")
