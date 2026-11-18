@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git
+.gitignore
+vector_store/*
+evals/
+*.md
+.env.example

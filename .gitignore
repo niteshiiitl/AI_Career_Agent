@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+vector_store/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.DS_Store
+data/scraped_jobs_*.json
