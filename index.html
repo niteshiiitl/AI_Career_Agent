@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareerAgent RAG — AI-Powered Job Matching</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── CSS Custom Properties ─────────────────────────────────────────── */
+    :root {
+      --bg:          #0f172a;
+      --surface:     #1e293b;
+      --border:      #334155;
+      --accent:      #3b82f6;
+      --accent-2:    #6366f1;
+      --text:        #f1f5f9;
+      --text-muted:  #64748b;
+      --text-dim:    #94a3b8;
+      --success:     #22c55e;
+      --warning:     #eab308;
+      --danger:      #ef4444;
+      --orange:      #f97316;
+      --radius:      12px;
+      --transition:  0.2s ease;
+    }
+
+    /* ── Reset / Base ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
+    a:hover { color: #60a5fa; }
+
+    /* ── Card ───────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      text-align: center;
+      padding: 48px 24px 32px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .logo-emoji { font-size: 2rem; }
+
+    .logo-career { color: #fff; }
+
+    .logo-rag {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .header-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 400;
+      max-width: 500px;
+      margin: 0 auto 24px;
+    }
+
+    /* Animated gradient line */
+    .gradient-line {
+      height: 3px;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6, #3b82f6);
+      background-size: 200% 100%;
+      animation: gradientShift 3s linear infinite;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    /* ── Main Grid ──────────────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 20px 16px;
+      }
+    }
+
+    /* ── Left Column ────────────────────────────────────────────────────── */
+    .left-col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Resume card */
+    .card-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+
+    textarea#resume-input {
+      width: 100%;
+      min-height: 300px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      padding: 14px;
+      resize: vertical;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+
+    textarea#resume-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    #char-count {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-align: right;
+      transition: color var(--transition);
+    }
+
+    #inline-error {
+      display: none;
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+
+    /* ── Scrape panel ───────────────────────────────────────────────────── */
+    .scrape-toggle-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-dim);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 14px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+    }
+
+    .scrape-toggle-btn:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .chevron { transition: transform var(--transition); font-style: normal; }
+    .chevron.open { transform: rotate(180deg); }
+
+    .scrape-panel {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 4px;
+    }
+
+    .scrape-panel.visible { display: flex; }
+
+    .scrape-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 20px;
+      border-top: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-input, .form-select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .form-select option { background: var(--surface); }
+
+    .btn-scrape {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      color: var(--accent);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .btn-scrape:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    #scrape-status {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Match Button ───────────────────────────────────────────────────── */
+    #match-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: filter var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    #match-btn:hover:not(:disabled) {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+
+    #match-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Stats bar ──────────────────────────────────────────────────────── */
+    #stats-bar {
+      display: none;
+      gap: 10px;
+      flex-wrap: wrap;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .stats-pill {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* ── Right Column ───────────────────────────────────────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Empty state */
+    #empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      text-align: center;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.6; }
+    }
+
+    #empty-state svg {
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    #empty-state p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* Results */
+    #results-list { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Match card */
+    .match-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color var(--transition);
+    }
+
+    .match-card:hover { border-color: rgba(59, 130, 246, 0.4); }
+
+    .match-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .match-job-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .match-job-company {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .score-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .score-green  { background: rgba(34, 197, 94, 0.15);  color: var(--success);  border: 1px solid rgba(34, 197, 94, 0.3); }
+    .score-yellow { background: rgba(234, 179, 8, 0.15);  color: var(--warning);  border: 1px solid rgba(234, 179, 8, 0.3); }
+    .score-red    { background: rgba(239, 68, 68, 0.15);  color: var(--danger);   border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .skills-section { margin-bottom: 12px; }
+
+    .skills-section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .skill-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      margin: 2px;
+      font-weight: 500;
+    }
+
+    .pill-green  { background: rgba(34, 197, 94, 0.12);  color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
+    .pill-orange { background: rgba(249, 115, 22, 0.12); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.25); }
+
+    .reasoning-section { margin-top: 12px; }
+
+    .reasoning-text {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-style: italic;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: all var(--transition);
+    }
+
+    .reasoning-text.expanded {
+      display: block;
+      -webkit-line-clamp: unset;
+    }
+
+    .show-more-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      padding: 4px 0 0;
+      display: block;
+      transition: color var(--transition);
+    }
+
+    .show-more-btn:hover { color: #60a5fa; }
+
+    /* ── Spinner ────────────────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .spinner-sm {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Toast ──────────────────────────────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      min-width: 260px;
+      max-width: 360px;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transform: translateX(120%);
+      animation: slideIn 0.3s ease forwards;
+    }
+
+    .toast-success { background: var(--success); }
+    .toast-error   { background: var(--danger); }
+
+    @keyframes slideIn {
+      to { transform: translateX(0); }
+    }
+
+    @keyframes slideOut {
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 28px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    footer a { margin-left: 12px; }
+
+    /* ── Scrape panel wrapper (keeps toggle + card flush) ───────────────── */
+    .scrape-wrapper { display: flex; flex-direction: column; }
+
+    .scrape-toggle-btn.open {
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-color: var(--border);
+    }
+
+    /* ── Section divider in match card ─────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 14px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Toast container ──────────────────────────────────────────────── -->
+  <div id="toast-container"></div>
+
+  <!-- ── Header ───────────────────────────────────────────────────────── -->
+  <header>
+    <div class="logo">
+      <span class="logo-emoji">🤖</span>
+      <span class="logo-career">CareerAgent</span>
+      <span class="logo-rag">RAG</span>
+    </div>
+    <p class="header-subtitle">AI-powered job matching — paste your resume, find your best opportunities</p>
+    <div class="gradient-line"></div>
+  </header>
+
+  <!-- ── Main content ──────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- LEFT column -->
+    <div class="left-col">
+
+      <!-- Resume input card -->
+      <div class="card">
+        <label class="card-label" for="resume-input">Your Resume</label>
+        <textarea
+          id="resume-input"
+          placeholder="Jane Smith
+jane@email.com · linkedin.com/in/janesmith · github.com/janesmith
+
+SUMMARY
+Backend engineer with 4+ years building scalable APIs and ML pipelines in Python.
+Proficient in FastAPI, AWS Lambda, and deploying models to production via Docker.
+
+SKILLS
+Languages: Python, SQL, Bash
+Frameworks: FastAPI, LangChain, scikit-learn, TensorFlow
+Cloud: AWS (EC2, S3, Lambda, SageMaker), Docker, Kubernetes
+Data: PostgreSQL, Redis, ChromaDB, Pandas, NumPy
+
+EXPERIENCE
+Senior Backend Engineer — Acme AI, 2021–Present
+  • Built a real-time recommendation engine using Machine Learning and embedding search
+  • Reduced API latency 40% by optimizing FastAPI async endpoints on AWS"
+        ></textarea>
+        <span id="char-count">0 characters</span>
+        <div id="inline-error"></div>
+      </div>
+
+      <!-- Scrape fresh jobs (collapsible) -->
+      <div class="scrape-wrapper">
+        <button class="scrape-toggle-btn" id="scrape-toggle" onclick="toggleScrapePanel()">
+          <span>🔍 Scrape Live Job Listings</span>
+          <em class="chevron" id="scrape-chevron">▼</em>
+        </button>
+        <div id="scrape-panel" class="scrape-panel">
+          <div class="scrape-card">
+            <div class="form-group">
+              <label class="form-label" for="scrape-query">Job Search Query</label>
+              <input class="form-input" id="scrape-query" type="text" placeholder="Machine Learning Engineer" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="scrape-location">Location</label>
+              <input class="form-input" id="scrape-location" type="text" placeholder="United States" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="scrape-num">Number of Results</label>
+              <input class="form-input" id="scrape-num" type="number" min="1" max="50" value="10" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="scrape-backend">Backend</label>
+              <select class="form-select" id="scrape-backend">
+                <option value="auto">auto</option>
+                <option value="jsearch">jsearch</option>
+                <option value="indeed">indeed</option>
+              </select>
+            </div>
+            <button class="btn-scrape" onclick="scrapeJobs()">Scrape &amp; Index Jobs</button>
+            <div id="scrape-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action button -->
+      <button id="match-btn" onclick="matchJobs()">Find My Job Matches →</button>
+
+      <!-- Stats bar -->
+      <div id="stats-bar">
+        <span class="stats-pill" id="stats-count">0 jobs matched</span>
+        <span class="stats-pill" id="stats-top">Top score: —</span>
+      </div>
+
+    </div><!-- /left-col -->
+
+    <!-- RIGHT column -->
+    <div class="right-col">
+
+      <!-- Empty state -->
+      <div id="empty-state">
+        <svg width="88" height="88" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Document body -->
+          <rect x="12" y="8" width="48" height="62" rx="6" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <!-- Document lines -->
+          <rect x="22" y="22" width="28" height="3" rx="1.5" fill="#334155"/>
+          <rect x="22" y="31" width="28" height="3" rx="1.5" fill="#334155"/>
+          <rect x="22" y="40" width="20" height="3" rx="1.5" fill="#334155"/>
+          <!-- Magnifying glass circle -->
+          <circle cx="62" cy="62" r="16" fill="#0f172a" stroke="#3b82f6" stroke-width="2.5"/>
+          <!-- Magnifying glass lens inner -->
+          <circle cx="62" cy="62" r="10" fill="none" stroke="#6366f1" stroke-width="2"/>
+          <!-- Handle -->
+          <line x1="73" y1="73" x2="82" y2="82" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+          <!-- Inner search cross-hair -->
+          <line x1="62" y1="56" x2="62" y2="68" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <line x1="56" y1="62" x2="68" y2="62" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+        <p>Your matched jobs will appear here</p>
+      </div>
+
+      <!-- Results list (cards injected by JS) -->
+      <div id="results-list"></div>
+
+    </div><!-- /right-col -->
+
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────────────── -->
+  <footer>
+    <span>Powered by LangChain · Groq · ChromaDB · FastAPI</span>
+    <a href="https://careeragent-rag.onrender.com/docs" target="_blank" rel="noopener">API Docs →</a>
+  </footer>
+
+  <!-- ── JavaScript ───────────────────────────────────────────────────── -->
+  <script>
+    const API_BASE = "https://careeragent-rag.onrender.com";
+
+    /* ── Character counter ─────────────────────────────────────────────── */
+    document.getElementById('resume-input').addEventListener('input', function () {
+      const len = this.value.length;
+      const counter = document.getElementById('char-count');
+      counter.textContent = len + ' characters';
+      counter.style.color = len < 50 ? '#ef4444' : '#64748b';
+    });
+
+    /* ── Scrape panel toggle ───────────────────────────────────────────── */
+    function toggleScrapePanel() {
+      const panel   = document.getElementById('scrape-panel');
+      const chevron = document.getElementById('scrape-chevron');
+      const btn     = document.getElementById('scrape-toggle');
+      const isOpen  = panel.classList.contains('visible');
+      if (isOpen) {
+        panel.classList.remove('visible');
+        chevron.classList.remove('open');
+        btn.classList.remove('open');
+        chevron.textContent = '▼';
+      } else {
+        panel.classList.add('visible');
+        chevron.classList.add('open');
+        btn.classList.add('open');
+        chevron.textContent = '▲';
+      }
+    }
+
+    /* ── Toast notifications ───────────────────────────────────────────── */
+    function showToast(message, type) {
+      type = type || 'success';
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(function () {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(function () {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 320);
+      }, 4000);
+    }
+
+    /* ── Build a single match card DOM element ─────────────────────────── */
+    function createMatchCard(match, index) {
+      const card = document.createElement('div');
+      card.className = 'match-card';
+
+      /* Score badge colour */
+      const score = match.match_score || 0;
+      let scoreCls = 'score-red';
+      if (score >= 80) scoreCls = 'score-green';
+      else if (score >= 60) scoreCls = 'score-yellow';
+
+      /* Title: prefer match.title, fall back to match.job_id */
+      const title   = match.title   || match.job_id  || 'Job Match';
+      const company = match.company || '';
+
+      /* Build matched skills pills */
+      const matchedSkills = (match.matched_skills || []).map(function (s) {
+        return '<span class="skill-pill pill-green">' + escHtml(s) + '</span>';
+      }).join('');
+
+      /* Build missing skills pills */
+      const missingSkills = (match.missing_skills || []).map(function (s) {
+        return '<span class="skill-pill pill-orange">' + escHtml(s) + '</span>';
+      }).join('');
+
+      const reasoning = match.reasoning || '';
+
+      card.innerHTML =
+        '<div class="match-card-header">' +
+          '<div>' +
+            '<div class="match-job-title">' + escHtml(title) + '</div>' +
+            (company ? '<div class="match-job-company">' + escHtml(company) + '</div>' : '') +
+          '</div>' +
+          '<span class="score-badge ' + scoreCls + '">' + score + '/100</span>' +
+        '</div>' +
+        (matchedSkills
+          ? '<div class="skills-section"><div class="skills-section-label">Matched Skills</div>' + matchedSkills + '</div>'
+          : '') +
+        (missingSkills
+          ? '<div class="skills-section"><div class="skills-section-label">Missing Skills</div>' + missingSkills + '</div>'
+          : '') +
+        (reasoning
+          ? '<hr class="divider" />' +
+            '<div class="reasoning-section">' +
+              '<div class="skills-section-label">Reasoning</div>' +
+              '<div class="reasoning-text" id="reason-' + index + '">' + escHtml(reasoning) + '</div>' +
+              '<button class="show-more-btn" id="showmore-' + index + '" onclick="toggleReason(' + index + ')">Show more</button>' +
+            '</div>'
+          : '');
+
+      /* Stagger entrance animation */
+      setTimeout(function () {
+        card.style.opacity    = '1';
+        card.style.transform  = 'translateX(0)';
+      }, index * 120);
+
+      return card;
+    }
+
+    /* ── Toggle reasoning clamp ────────────────────────────────────────── */
+    function toggleReason(index) {
+      const el  = document.getElementById('reason-' + index);
+      const btn = document.getElementById('showmore-' + index);
+      if (!el) return;
+      const expanded = el.classList.toggle('expanded');
+      btn.textContent = expanded ? 'Show less' : 'Show more';
+    }
+
+    /* ── HTML escape helper ────────────────────────────────────────────── */
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,  '&amp;')
+        .replace(/</g,  '&lt;')
+        .replace(/>/g,  '&gt;')
+        .replace(/"/g,  '&quot;')
+        .replace(/'/g,  '&#039;');
+    }
+
+    /* ── Render all match cards ────────────────────────────────────────── */
+    function renderMatches(matches) {
+      const list = document.getElementById('results-list');
+      document.getElementById('empty-state').style.display = 'none';
+      list.innerHTML = '';
+      matches.forEach(function (match, i) {
+        const card = createMatchCard(match, i);
+        list.appendChild(card);
+      });
+
+      /* Stats bar */
+      const topScore = Math.max.apply(null, matches.map(function (m) { return m.match_score || 0; }));
+      document.getElementById('stats-count').textContent = matches.length + ' jobs matched';
+      document.getElementById('stats-top').textContent   = 'Top score: ' + topScore + '/100';
+      document.getElementById('stats-bar').style.display = 'flex';
+    }
+
+    /* ── Main: call /match-jobs ────────────────────────────────────────── */
+    async function matchJobs() {
+      const resumeText = document.getElementById('resume-input').value.trim();
+      const inlineErr  = document.getElementById('inline-error');
+
+      if (resumeText.length < 50) {
+        inlineErr.textContent   = 'Please enter at least 50 characters of resume text.';
+        inlineErr.style.display = 'block';
+        return;
+      }
+      inlineErr.style.display = 'none';
+
+      const btn = document.getElementById('match-btn');
+      btn.disabled  = true;
+      btn.innerHTML = '<span class="spinner"></span> Matching...';
+
+      try {
+        const resp = await fetch(API_BASE + '/match-jobs', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ resume_text: resumeText })
+        });
+
+        if (!resp.ok) {
+          let detail = 'Request failed.';
+          try {
+            const j = await resp.json();
+            detail = j.detail || detail;
+          } catch (_) {}
+          if (resp.status === 422) detail = 'Please enter at least 50 characters of resume text.';
+          throw new Error(detail);
+        }
+
+        const data    = await resp.json();
+        const matches = Array.isArray(data) ? data : (data.matches || [data]);
+        renderMatches(matches);
+        showToast('✓ Found ' + matches.length + ' job matches!', 'success');
+
+      } catch (err) {
+        showToast('✗ ' + (err.message || 'Could not reach the API. Is the server running?'), 'error');
+      } finally {
+        btn.disabled  = false;
+        btn.innerHTML = 'Find My Job Matches →';
+      }
+    }
+
+    /* ── Scrape: call /scrape-jobs ─────────────────────────────────────── */
+    async function scrapeJobs() {
+      const query      = document.getElementById('scrape-query').value.trim()    || 'Software Engineer';
+      const location   = document.getElementById('scrape-location').value.trim() || 'United States';
+      const numResults = parseInt(document.getElementById('scrape-num').value)   || 10;
+      const backend    = document.getElementById('scrape-backend').value;
+      const statusEl   = document.getElementById('scrape-status');
+
+      statusEl.innerHTML = '<span class="spinner-sm"></span>&nbsp;Scraping...';
+
+      try {
+        const resp = await fetch(API_BASE + '/scrape-jobs', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ query, location, num_results: numResults, backend })
+        });
+
+        if (!resp.ok) {
+          const j = await resp.json().catch(function () { return {}; });
+          throw new Error(j.detail || 'Scrape failed.');
+        }
+
+        const data  = await resp.json();
+        const count = data.jobs_added || data.count || numResults;
+        statusEl.textContent   = '✓ ' + count + ' jobs indexed.';
+        statusEl.style.color   = '#22c55e';
+        showToast('✓ ' + count + ' jobs added to index', 'success');
+
+      } catch (err) {
+        statusEl.textContent = '✗ ' + err.message;
+        statusEl.style.color = '#ef4444';
+        showToast('✗ ' + err.message, 'error');
+      }
+    }
+  </script>
+
+</body>
+</html>
