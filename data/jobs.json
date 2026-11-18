@@ -1,0 +1,82 @@
+[
+  {
+    "job_id": "job_001",
+    "title": "Machine Learning Engineer",
+    "company": "NeuralPath AI",
+    "description": "Design, train, and deploy machine learning models at scale for real-time inference. You will collaborate with data scientists and product teams to productionize ML pipelines using MLflow and Kubernetes. The role requires hands-on experience with deep learning frameworks and cloud-based model serving. You will also own model monitoring, retraining workflows, and A/B testing infrastructure.",
+    "skills_req": ["Python", "PyTorch", "TensorFlow", "MLflow", "Kubernetes", "Docker", "SQL"],
+    "min_salary": 150000
+  },
+  {
+    "job_id": "job_002",
+    "title": "Backend Engineer",
+    "company": "Streamline Systems",
+    "description": "Build and maintain high-throughput REST and gRPC APIs serving millions of requests per day. You will work closely with frontend engineers and DevOps to design scalable microservices using FastAPI and PostgreSQL. The team operates on a continuous deployment model with strict SLAs, requiring deep understanding of caching, rate limiting, and distributed tracing. Strong proficiency in async Python and message queues is expected.",
+    "skills_req": ["Python", "FastAPI", "PostgreSQL", "Redis", "Docker", "gRPC", "RabbitMQ"],
+    "min_salary": 130000
+  },
+  {
+    "job_id": "job_003",
+    "title": "Data Scientist",
+    "company": "Insight Analytics Co.",
+    "description": "Develop statistical models and machine learning solutions to drive business decisions across marketing, operations, and finance. You will perform exploratory data analysis, feature engineering, and model selection while communicating insights to non-technical stakeholders. The role involves A/B experiment design and causal inference to measure the impact of product changes. Proficiency with large datasets in Spark or BigQuery is essential.",
+    "skills_req": ["Python", "scikit-learn", "Pandas", "NumPy", "SQL", "Spark", "Statistics"],
+    "min_salary": 120000
+  },
+  {
+    "job_id": "job_004",
+    "title": "DevOps Engineer",
+    "company": "CloudOps Pro",
+    "description": "Own the CI/CD infrastructure and cloud environments supporting 50+ microservices deployed on AWS. You will manage Terraform infrastructure-as-code, design GitOps workflows with ArgoCD, and ensure 99.9% uptime through proactive monitoring and incident response. The position requires experience hardening containerized workloads and automating security compliance checks. You will mentor developers on platform best practices.",
+    "skills_req": ["Terraform", "AWS", "Kubernetes", "Docker", "GitHub Actions", "ArgoCD", "Python"],
+    "min_salary": 135000
+  },
+  {
+    "job_id": "job_005",
+    "title": "Frontend Engineer",
+    "company": "Pixel & Co.",
+    "description": "Craft responsive, accessible web applications used by over 2 million monthly active users. You will lead the migration of a legacy AngularJS codebase to React with TypeScript, collaborating with UX designers to implement pixel-perfect interfaces. Performance optimization, code splitting, and Core Web Vitals benchmarks are first-class concerns for this team. Experience with design systems and component libraries like Storybook is a strong plus.",
+    "skills_req": ["React", "TypeScript", "JavaScript", "CSS", "HTML", "Storybook", "Webpack"],
+    "min_salary": 115000
+  },
+  {
+    "job_id": "job_006",
+    "title": "Full Stack Engineer",
+    "company": "LaunchPad Ventures",
+    "description": "Build product features end-to-end across a Next.js frontend and a Node.js/Express backend for a fast-growing B2B SaaS platform. You will own entire vertical slices of the product, from database schema design in PostgreSQL to deploying serverless functions on AWS Lambda. The role requires comfort with ambiguity and the ability to ship user-facing features rapidly in a startup environment. GraphQL API design and experience with authentication flows are expected.",
+    "skills_req": ["Next.js", "React", "Node.js", "PostgreSQL", "GraphQL", "AWS Lambda", "TypeScript"],
+    "min_salary": 125000
+  },
+  {
+    "job_id": "job_007",
+    "title": "Data Engineer",
+    "company": "DataFlow Technologies",
+    "description": "Design and maintain petabyte-scale data pipelines that ingest, transform, and serve data to analytics and ML teams. You will build robust ETL workflows using Apache Airflow and dbt, integrating data from dozens of third-party APIs and event streams via Kafka. The role requires deep expertise in cloud data warehouses and query optimization for cost efficiency. You will establish data quality frameworks and lineage tracking across the platform.",
+    "skills_req": ["Python", "Apache Airflow", "dbt", "Kafka", "Snowflake", "Spark", "SQL"],
+    "min_salary": 140000
+  },
+  {
+    "job_id": "job_008",
+    "title": "Cloud Architect",
+    "company": "Nimbus Infrastructure",
+    "description": "Define the cloud strategy and reference architectures for a portfolio of enterprise clients migrating workloads to multi-cloud environments. You will evaluate AWS, Azure, and GCP services, design for resilience and cost optimization, and produce architectural decision records for critical systems. The role demands extensive experience with networking, identity management, and regulatory compliance frameworks such as SOC 2 and HIPAA. You will act as a technical authority across engineering and security teams.",
+    "skills_req": ["AWS", "Azure", "GCP", "Terraform", "Networking", "Security", "Kubernetes"],
+    "min_salary": 180000
+  },
+  {
+    "job_id": "job_009",
+    "title": "AI Research Scientist",
+    "company": "Cognify Labs",
+    "description": "Conduct original research in large language models, retrieval-augmented generation, and efficient fine-tuning methods, publishing results at top-tier venues. You will prototype novel architectures in PyTorch, run large-scale ablation studies on GPU clusters, and collaborate with the product team to transfer research breakthroughs into production. The role blends rigorous scientific methodology with engineering pragmatism. A strong publication record or demonstrable open-source contributions are highly valued.",
+    "skills_req": ["Python", "PyTorch", "NLP", "Transformers", "CUDA", "Research", "LLMs"],
+    "min_salary": 200000
+  },
+  {
+    "job_id": "job_010",
+    "title": "Technical Product Manager",
+    "company": "BuildRight Software",
+    "description": "Drive the roadmap for a developer-facing API platform used by thousands of engineers at mid-market companies. You will synthesize customer feedback, competitive analysis, and engineering constraints into a prioritized backlog, writing detailed product requirements and acceptance criteria. The role requires close collaboration with engineering leads on architecture trade-offs and with the go-to-market team on launch strategy. Prior hands-on software engineering experience is required to maintain credibility with technical stakeholders.",
+    "skills_req": ["Product Strategy", "API Design", "Agile", "SQL", "Data Analysis", "Communication", "Roadmapping"],
+    "min_salary": 145000
+  }
+]
