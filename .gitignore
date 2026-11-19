@@ -1,13 +1,28 @@
+# Secrets — never push
 .env
+
+# Virtual environment
+venv/
+.venv/
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-vector_store/
 *.egg-info/
+
+# Vector store runtime data (re-built on startup)
+vector_store/*
+!vector_store/.gitkeep
+
+# Scraped job dumps (runtime artifacts)
+data/scraped_jobs_*.json
+
+# Build artifacts
 dist/
 build/
-.venv/
-venv/
+
+# OS junk
 .DS_Store
-data/scraped_jobs_*.json
+Thumbs.db

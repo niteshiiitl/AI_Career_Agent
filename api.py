@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
 
@@ -51,6 +53,13 @@ app = FastAPI(
     description="Context-aware job matching system powered by LangChain, Groq, and ChromaDB.",
     lifespan=lifespan,
 )
+
+# Serve index.html at the root so users get the UI when they visit the Render URL
+@app.get("/", include_in_schema=False)
+async def serve_frontend():
+    """Serve the frontend UI."""
+    index_path = os.path.join(PROJECT_ROOT, "index.html")
+    return FileResponse(index_path, media_type="text/html")
 
 
 @app.get("/health")

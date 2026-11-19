@@ -14,10 +14,7 @@ _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _PROJECT_ROOT)
 
 from dotenv import load_dotenv
-
 load_dotenv(os.path.join(_PROJECT_ROOT, ".env"))
-
-import os  # re-imported after path setup for clarity in later calls
 
 from datasets import Dataset
 from langchain_groq import ChatGroq
@@ -30,7 +27,7 @@ from ragas.metrics import context_precision, faithfulness
 from core.retrieval import semantic_job_search
 
 # ---------------------------------------------------------------------------
-# Mock resume queries
+# Mock resume queries (questions)
 # ---------------------------------------------------------------------------
 QUERIES = [
     (
@@ -48,7 +45,7 @@ QUERIES = [
 ]
 
 # ---------------------------------------------------------------------------
-# Ground-truth answers (ideal, authoritative)
+# Ground-truth answers (ideal authoritative answers)
 # ---------------------------------------------------------------------------
 GROUND_TRUTHS = [
     (
@@ -68,7 +65,7 @@ GROUND_TRUTHS = [
 ]
 
 # ---------------------------------------------------------------------------
-# Mock LLM-generated answers (slightly imperfect to test faithfulness)
+# Mock LLM-generated answers (slightly imperfect to make evals interesting)
 # ---------------------------------------------------------------------------
 GENERATED_ANSWERS = [
     (
@@ -96,10 +93,11 @@ def build_dataset() -> Dataset:
     Returns:
         A HuggingFace Dataset with columns: question, answer, contexts, ground_truth.
     """
+    print("Running semantic search to build contexts...")
     all_contexts = []
-    for query in QUERIES:
+    for i, query in enumerate(QUERIES):
+        print(f"  [{i+1}/{len(QUERIES)}] Searching: {query[:60]}...")
         job_metas = semantic_job_search(query, top_k=3)
-        # Build a readable context string per retrieved job.
         contexts = [
             f"{m.get('title', '')} at {m.get('company', '')}. "
             f"{m.get('description', '')} "
@@ -107,6 +105,7 @@ def build_dataset() -> Dataset:
             for m in job_metas
         ]
         all_contexts.append(contexts)
+        print(f"       Retrieved {len(contexts)} contexts.")
 
     return Dataset.from_dict(
         {
@@ -119,31 +118,55 @@ def build_dataset() -> Dataset:
 
 
 if __name__ == "__main__":
+    print("=" * 60)
+    print("  CareerAgent-RAG — Ragas Evaluation")
+    print("=" * 60)
+
+    # Step 1 — Build dataset
+    print("\n[1/3] Building evaluation dataset...")
+    dataset = build_dataset()
+    print(f"      Dataset ready: {len(dataset)} samples.\n")
+
+    # Step 2 — Configure LLM and embeddings
+    print("[2/3] Configuring Ragas with Groq LLM + HuggingFace embeddings...")
+    groq_llm = ChatGroq(
+        model="llama3-8b-8192",
+        temperature=0,
+        api_key=os.getenv("GROQ_API_KEY"),
+    )
+    hf_embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+    ragas_llm        = LangchainLLMWrapper(groq_llm)
+    ragas_embeddings = LangchainEmbeddingsWrapper(hf_embeddings)
+
+    # Assign LLM and embeddings to each metric
+    context_precision.llm        = ragas_llm
+    context_precision.embeddings = ragas_embeddings
+    faithfulness.llm             = ragas_llm
+    faithfulness.embeddings      = ragas_embeddings
+    print("      Done.\n")
+
+    # Step 3 — Run evaluation
+    print("[3/3] Running Ragas evaluation (this calls Groq API, ~30-60s)...")
     try:
-        print("Building evaluation dataset...")
-        dataset = build_dataset()
-
-        print("Configuring Ragas LLM and embeddings (Groq + HuggingFace)...")
-        groq_llm = ChatGroq(
-            model="llama3-8b-8192",
-            temperature=0,
-            api_key=os.getenv("GROQ_API_KEY"),
+        result = evaluate(
+            dataset,
+            metrics=[context_precision, faithfulness],
         )
-        hf_embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-        ragas_llm = LangchainLLMWrapper(groq_llm)
-        ragas_embeddings = LangchainEmbeddingsWrapper(hf_embeddings)
-
-        for metric in [context_precision, faithfulness]:
-            metric.llm = ragas_llm
-            metric.embeddings = ragas_embeddings
-
-        print("Running Ragas evaluation (context_precision, faithfulness)...")
-        result = evaluate(dataset, metrics=[context_precision, faithfulness])
-
-        print("\n=== RAG Evaluation Results ===")
-        print(result)
+        print("\n" + "=" * 60)
+        print("  EVALUATION RESULTS")
+        print("=" * 60)
+        df = result.to_pandas()
+        print(df.to_string(index=False))
+        print("\n--- Aggregate Scores ---")
+        print(f"  context_precision : {result['context_precision']:.4f}  (ideal: 1.0)")
+        print(f"  faithfulness      : {result['faithfulness']:.4f}  (ideal: 1.0)")
+        print("=" * 60)
+        print("\nInterpretation:")
+        print("  context_precision — Did ChromaDB retrieve the RIGHT jobs for each query?")
+        print("  faithfulness      — Did the LLM answer stick to the retrieved context (no hallucination)?")
 
     except Exception as exc:
-        print(f"Evaluation failed: {exc}")
+        print(f"\n[ERROR] Evaluation failed: {exc}")
         raise
