@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
 
